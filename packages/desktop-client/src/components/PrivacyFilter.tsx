@@ -47,11 +47,9 @@ export function PrivacyFilter({
   ...props
 }: PrivacyFilterProps) {
   const privacyMode = usePrivacyMode();
-  // Limit mobile support for now.
   const { isNarrowWidth } = useResponsive();
   const activate =
     privacyMode &&
-    !isNarrowWidth &&
     (!activationFilters ||
       activationFilters.every(value =>
         typeof value === 'boolean' ? value : value(),
@@ -60,7 +58,9 @@ export function PrivacyFilter({
   return !activate ? (
     <>{Children.toArray(children)}</>
   ) : (
-    <PrivacyOverlay {...props}>{children}</PrivacyOverlay>
+    <PrivacyOverlay {...props} revealOnHover={!isNarrowWidth}>
+      {children}
+    </PrivacyOverlay>
   );
 }
 
@@ -94,7 +94,7 @@ function RedactedContent({ children }: RedactedContentProps) {
   return <div ref={containerRef}>{children}</div>;
 }
 
-function PrivacyOverlay({ children, ...props }) {
+function PrivacyOverlay({ children, revealOnHover = true, ...props }) {
   const { style, ...restProps } = props;
 
   return (
@@ -111,19 +111,22 @@ function PrivacyOverlay({ children, ...props }) {
             ' > div:nth-child(2)': {
               display: 'flex',
             },
-            '&:hover': {
-              ' > div:first-child': {
-                opacity: 1,
+            ...(revealOnHover && {
+              '&:hover': {
+                ' > div:first-child': {
+                  opacity: 1,
+                },
+                ' > div:nth-child(2)': {
+                  display: 'none',
+                },
               },
-              ' > div:nth-child(2)': {
-                display: 'none',
-              },
-            },
+            }),
           },
         ],
         style,
       )}
       {...restProps}
+      data-privacy-hidden="true"
     >
       <div
         className={css([

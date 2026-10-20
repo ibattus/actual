@@ -8,11 +8,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useLocation, useParams, useSearchParams } from 'react-router';
 
 import { Button } from '@actual-app/components/button';
+import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { SvgSplit } from '@actual-app/components/icons/v0';
 import {
   SvgAdd,
@@ -64,6 +65,7 @@ import type {
   PayeeEntity,
   TransactionEntity,
 } from '@actual-app/core/types/models';
+import { css, keyframes } from '@emotion/css';
 import {
   format as formatDate,
   isValid as isValidDate,
@@ -78,10 +80,10 @@ import {
   FieldLabel,
   InputField,
   TapField,
-  ToggleField,
 } from '#components/mobile/MobileForms';
 import { getPrettyPayee } from '#components/mobile/utils';
 import { MobilePageHeader, Page } from '#components/Page';
+import { PrivacyFilter } from '#components/PrivacyFilter';
 import {
   propagateRuleChangeToSubtransactions,
   transactionForRulesFromList,
@@ -118,8 +120,20 @@ import {
   isFutureTransaction,
 } from '#util/schedule-actions';
 
-import { AmountInput } from './AmountInput';
 import { SplitAmountInput } from './SplitAmountInput';
+import { TransactionAmountSection } from './TransactionAmountSection';
+import { TransactionEntryField } from './TransactionEntryField';
+import { TransactionFieldDropdown } from './TransactionFieldDropdown';
+import type { TransactionDropdownField } from './TransactionFieldDropdown';
+
+const mobileTransactionEntrySlideIn = keyframes({
+  from: { transform: 'translateY(100%)' },
+  to: { transform: 'translateY(0)' },
+});
+const mobileTransactionEntryClassName = css({
+  animation: `${mobileTransactionEntrySlideIn} 240ms cubic-bezier(0.22, 1, 0.36, 1)`,
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+});
 
 function getFieldName(transactionId: TransactionEntity['id'], field: string) {
   return `${field}-${transactionId}`;
@@ -249,6 +263,7 @@ type FooterProps = {
   onEditField: (
     id: TransactionEntity['id'],
     field: 'category' | 'payee' | 'account' | 'date' | 'amount' | 'notes',
+    anchor?: Element,
   ) => void;
 };
 
@@ -285,9 +300,9 @@ function Footer({
       style={{
         paddingLeft: styles.mobileEditingPadding,
         paddingRight: styles.mobileEditingPadding,
-        paddingTop: 10,
-        paddingBottom: 'calc(10px + env(safe-area-inset-bottom))',
-        backgroundColor: theme.tableHeaderBackground,
+        paddingTop: 12,
+        paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+        backgroundColor: theme.mobilePageBackground,
         borderTopWidth: 1,
         borderColor: theme.tableBorder,
         gap: 8,
@@ -296,7 +311,7 @@ function Footer({
       {isFuture && (
         <Button
           variant="normal"
-          style={{ height: styles.mobileMinHeight }}
+          style={{ height: 52, borderRadius: 14, fontSize: 16 }}
           isDisabled={!!editingField}
           onPress={onSchedule}
         >
@@ -314,7 +329,7 @@ function Footer({
       {transaction.error?.type === 'SplitTransactionError' ? (
         <Button
           variant="primary"
-          style={{ height: styles.mobileMinHeight }}
+          style={{ height: 52, borderRadius: 14, fontSize: 16 }}
           isDisabled={!!editingField}
           onPress={onClickRemainingSplit}
         >
@@ -354,9 +369,15 @@ function Footer({
       ) : !transaction.account ? (
         <Button
           variant="primary"
-          style={{ height: styles.mobileMinHeight }}
+          style={{ height: 52, borderRadius: 14, fontSize: 16 }}
           isDisabled={!!editingField}
-          onPress={() => onEditField(transaction.id, 'account')}
+          onPress={event =>
+            onEditField(
+              transaction.id,
+              'account',
+              event.target.closest('button') ?? event.target,
+            )
+          }
         >
           <SvgPiggyBank width={17} height={17} />
           <Text
@@ -371,7 +392,7 @@ function Footer({
       ) : isAdding ? (
         <Button
           variant="primary"
-          style={{ height: styles.mobileMinHeight }}
+          style={{ height: 52, borderRadius: 14, fontSize: 16 }}
           isDisabled={!!editingField}
           onPress={onAdd}
         >
@@ -388,7 +409,7 @@ function Footer({
       ) : (
         <Button
           variant="primary"
-          style={{ height: styles.mobileMinHeight }}
+          style={{ height: 52, borderRadius: 14, fontSize: 16 }}
           isDisabled={!!editingField}
           onPress={onSave}
         >
@@ -422,6 +443,7 @@ type ChildTransactionEditProps = {
   onEditField: (
     id: TransactionEntity['id'],
     field: 'category' | 'payee' | 'account' | 'date' | 'amount' | 'notes',
+    anchor?: Element,
   ) => void;
   onUpdate: <Field extends keyof TransactionEntity>(
     transaction: TransactionEntity,
@@ -473,9 +495,9 @@ const ChildTransactionEdit = forwardRef<
               ? theme.tableBorderSelected
               : theme.tableBorder,
           borderWidth: '1px',
-          borderRadius: '5px',
-          padding: '5px',
-          margin: '10px',
+          borderRadius: 16,
+          padding: '8px 0',
+          margin: '8px 0',
         }}
       >
         <View style={{ flexDirection: 'row' }}>
@@ -494,7 +516,13 @@ const ChildTransactionEdit = forwardRef<
                 editingField !== getFieldName(transaction.id, 'payee')
               }
               value={prettyPayee}
-              onPress={() => onEditField(transaction.id, 'payee')}
+              onPress={event =>
+                onEditField(
+                  transaction.id,
+                  'payee',
+                  event.target.closest('button') ?? event.target,
+                )
+              }
               data-testid={`payee-field-${transaction.id}`}
             />
           </View>
@@ -547,7 +575,13 @@ const ChildTransactionEdit = forwardRef<
               isOffBudget ||
               isBudgetTransfer(transaction)
             }
-            onPress={() => onEditField(transaction.id, 'category')}
+            onPress={event =>
+              onEditField(
+                transaction.id,
+                'category',
+                event.target.closest('button') ?? event.target,
+              )
+            }
             data-testid={`category-field-${transaction.id}`}
           />
         </View>
@@ -651,6 +685,7 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
     nearestPayee,
   }) {
     const { t } = useTranslation();
+    const { isNarrowWidth } = useResponsive();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showHiddenCategories] = useLocalPref('budget.showHiddenCategories');
@@ -667,6 +702,21 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
     const { data: { grouped: categoryGroups } = { grouped: [] } } =
       useCategories();
     const noteRef = useRef<HTMLInputElement | null>(null);
+    const [entryStep, setEntryStep] = useState<'amount' | 'details'>(
+      isAdding ? 'amount' : 'details',
+    );
+    const [continueRequest, setContinueRequest] = useState(0);
+    const [incomeAtZero, setIncomeAtZero] = useState(false);
+    const [showNotes, setShowNotes] = useState(false);
+    const [fieldDropdown, setFieldDropdown] = useState<{
+      transactionId: TransactionEntity['id'];
+      field: TransactionDropdownField;
+      anchor: RefObject<HTMLButtonElement | null>;
+    } | null>(null);
+    const accountDropdownTrigger = useRef<HTMLButtonElement>(null);
+    const payeeDropdownTrigger = useRef<HTMLButtonElement>(null);
+    const categoryDropdownTrigger = useRef<HTMLButtonElement>(null);
+    const transferDropdownTrigger = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
       if (window.history.length === 1) {
@@ -961,82 +1011,38 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
       (
         transactionId: TransactionEntity['id'],
         name: 'category' | 'payee' | 'account' | 'date' | 'amount' | 'notes',
+        _anchor?: Element,
       ) => {
-        onRequestActiveEdit?.(getFieldName(transaction.id, name), () => {
-          const transactionToEdit = transactions.find(
-            t => t.id === transactionId,
-          );
-          const unserializedTransaction = unserializedTransactions.find(
-            t => t.id === transactionId,
-          );
+        const transactionToEdit = transactions.find(
+          t => t.id === transactionId,
+        );
+        const unserializedTransaction = unserializedTransactions.find(
+          t => t.id === transactionId,
+        );
 
-          if (!unserializedTransaction || !transactionToEdit) {
-            throw new Error(`Transaction ${transactionId} not found`);
+        if (!unserializedTransaction || !transactionToEdit) {
+          throw new Error(`Transaction ${transactionId} not found`);
+        }
+
+        if (name === 'category' || name === 'account' || name === 'payee') {
+          const target =
+            name === 'account'
+              ? accountDropdownTrigger
+              : name === 'payee'
+                ? payeeDropdownTrigger
+                : categoryDropdownTrigger;
+          if (target.current) {
+            setFieldDropdown({
+              transactionId,
+              field: name,
+              anchor: target,
+            });
           }
+          return;
+        }
 
+        onRequestActiveEdit?.(getFieldName(transaction.id, name), () => {
           switch (name) {
-            case 'category':
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'category-autocomplete',
-                    options: {
-                      categoryGroups,
-                      showHiddenCategories,
-                      showNoneOption: true,
-                      month: monthUtils.monthFromDate(
-                        unserializedTransaction.date,
-                      ),
-                      onSelect: categoryId => {
-                        void onUpdateInner(
-                          transactionToEdit,
-                          name,
-                          categoryId as TransactionEntity['category'],
-                        );
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
-            case 'account':
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'account-autocomplete',
-                    options: {
-                      onSelect: accountId => {
-                        void onUpdateInner(transactionToEdit, name, accountId);
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
-            case 'payee':
-              dispatch(
-                pushModal({
-                  modal: {
-                    name: 'payee-autocomplete',
-                    options: {
-                      showNoneOption: !!transactionToEdit.payee,
-                      onSelect: payeeId => {
-                        void onUpdateInner(transactionToEdit, name, payeeId);
-                      },
-                      onClose: () => {
-                        onClearActiveEdit();
-                      },
-                    },
-                  },
-                }),
-              );
-              break;
             default:
               dispatch(
                 pushModal({
@@ -1072,7 +1078,6 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
         });
       },
       [
-        categoryGroups,
         dispatch,
         onUpdateInner,
         onClearActiveEdit,
@@ -1080,7 +1085,6 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
         transaction.id,
         transactions,
         unserializedTransactions,
-        showHiddenCategories,
       ],
     );
 
@@ -1201,355 +1205,579 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
     );
     const dateDefaultValue = monthUtils.dayFromDate(transactionDate);
 
+    const onTransfer = () => {
+      setFieldDropdown({
+        transactionId: transaction.id,
+        field: 'transfer',
+        anchor: transferDropdownTrigger,
+      });
+    };
+    const dropdownTransaction = transactions.find(
+      t => t.id === fieldDropdown?.transactionId,
+    );
+    const closeDropdown = () => {
+      setFieldDropdown(null);
+      onClearActiveEdit();
+    };
+    const amountIsIncome =
+      transaction.amount === 0 ? incomeAtZero : transaction.amount > 0;
+
     const remaining = transaction.error?.difference ?? 0;
 
     return (
       <Page
+        className={
+          isAdding && isNarrowWidth
+            ? mobileTransactionEntryClassName
+            : undefined
+        }
         header={
           <MobilePageHeader
             title={
-              transaction.payee == null
-                ? isAdding
-                  ? t('New Transaction')
-                  : t('Transaction')
-                : title
+              isAdding
+                ? t('New Transaction')
+                : transaction.payee == null
+                  ? t('Transaction')
+                  : title
             }
-            leftContent={<MobileBackButton />}
+            leftContent={
+              <MobileBackButton
+                onPress={
+                  entryStep === 'details'
+                    ? () => setEntryStep('amount')
+                    : undefined
+                }
+              />
+            }
           />
         }
         footer={
-          <Footer
-            transactions={transactions}
-            isAdding={isAdding}
-            onAdd={onSaveInner}
-            onSave={onSaveInner}
-            onSchedule={onSchedule}
-            onSplit={onSplit}
-            onAddSplit={onAddSplit}
-            onEmptySplitFound={onEmptySplitFound}
-            editingField={editingField}
-            isFuture={isFuture}
-            onEditField={onEditFieldInner}
-          />
+          entryStep === 'amount' && !isAdding ? (
+            <View
+              style={{
+                padding: '12px 16px',
+                paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+                backgroundColor: theme.mobilePageBackground,
+              }}
+            >
+              <Button
+                variant="primary"
+                onPress={() => setContinueRequest(request => request + 1)}
+                style={{ minHeight: 52, borderRadius: 14, fontSize: 16 }}
+              >
+                <Trans>Continue</Trans>
+              </Button>
+            </View>
+          ) : (
+            <Footer
+              transactions={transactions}
+              isAdding={isAdding}
+              onAdd={onSaveInner}
+              onSave={onSaveInner}
+              onSchedule={onSchedule}
+              onSplit={onSplit}
+              onAddSplit={onAddSplit}
+              onEmptySplitFound={onEmptySplitFound}
+              editingField={editingField}
+              isFuture={isFuture}
+              onEditField={onEditFieldInner}
+            />
+          )
         }
         padding={0}
       >
         <View
           data-testid="transaction-form"
-          style={{ flexShrink: 0, marginTop: 20, marginBottom: 20 }}
+          style={{
+            flexShrink: 0,
+            margin: '8px auto 16px',
+            padding: '0 12px',
+            width: '100%',
+            maxWidth: 560,
+            boxSizing: 'border-box',
+          }}
         >
-          <View
-            style={{
-              alignItems: 'center',
-            }}
-          >
-            <FieldLabel title={t('Amount')} flush style={{ marginBottom: 0 }} />
-            <AmountInput
+          {isAdding && (
+            <TransactionAmountSection
+              key={transaction.id}
               value={transaction.amount}
-              negate
-              disabled={
-                !!editingField &&
-                editingField !== getFieldName(transaction.id, 'amount')
-              }
-              autoFocus={isAdding}
+              continueRequest={continueRequest}
+              initialIncome={incomeAtZero}
+              onTypeChange={setIncomeAtZero}
+              autoFocus
+              compact
               disableNativeAutoFocusOnIOS
-              onFocus={() => {
-                onRequestActiveEdit(getFieldName(transaction.id, 'amount'));
-              }}
+              onFocus={() =>
+                onRequestActiveEdit(getFieldName(transaction.id, 'amount'))
+              }
               onBlur={() => onClearActiveEdit()}
               onChange={onTotalAmountUpdate}
-              variant="large"
             />
-          </View>
-
-          <View>
-            <FieldLabel title={t('Payee')} />
-            <TapField
-              icon={<SvgUser width={17} height={17} />}
-              placeholder={
-                transaction.amount > 0
-                  ? t('Who paid you?')
-                  : t('Who did you pay?')
-              }
-              textStyle={{
-                ...(transaction.is_parent && {
-                  fontStyle: 'italic',
-                  fontWeight: 300,
-                }),
+          )}
+          {!isAdding && (
+            <View
+              role="list"
+              aria-label={t('Transaction steps')}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                padding: '4px 4px 16px',
               }}
-              value={title}
-              isDisabled={
-                !!editingField &&
-                editingField !== getFieldName(transaction.id, 'payee')
-              }
-              onPress={() => onEditFieldInner(transaction.id, 'payee')}
-              data-testid="payee-field"
-              alwaysShowRightContent={
-                (!!nearestPayee || !!onRequestLocation) &&
-                !transaction.payee &&
-                !shouldShowSaveLocation
-              }
-              rightContent={
-                shouldShowSaveLocation ? (
-                  <Button
-                    variant="bare"
-                    onPress={onSaveLocation}
-                    style={{
-                      backgroundColor: theme.buttonNormalBackground,
-                      border: `1px solid ${theme.buttonNormalBorder}`,
-                      color: theme.buttonNormalText,
-                      fontSize: '11px',
-                      padding: '4px 8px',
-                      borderRadius: 3,
-                      height: 'auto',
-                      minHeight: 'auto',
-                    }}
-                  >
-                    <Trans>Save</Trans>
-                    <SvgLocation
-                      width={10}
-                      height={10}
-                      style={{ marginLeft: 4 }}
-                    />
-                  </Button>
-                ) : nearestPayee && !transaction.payee ? (
-                  <Button
-                    variant="bare"
-                    onPress={onSelectNearestPayee}
-                    style={{
-                      backgroundColor: theme.buttonNormalBackground,
-                      border: `1px solid ${theme.buttonNormalBorder}`,
-                      color: theme.buttonNormalText,
-                      fontSize: '11px',
-                      padding: '4px 8px',
-                      borderRadius: 3,
-                      height: 'auto',
-                      minHeight: 'auto',
-                    }}
-                  >
-                    <Trans>Nearby</Trans>
-                    <SvgLocation
-                      width={10}
-                      height={10}
-                      style={{ marginLeft: 4 }}
-                    />
-                  </Button>
-                ) : onRequestLocation && !transaction.payee ? (
-                  <Button
-                    variant="bare"
-                    onPress={onRequestLocation}
-                    style={{
-                      backgroundColor: theme.buttonNormalBackground,
-                      border: `1px solid ${theme.buttonNormalBorder}`,
-                      color: theme.buttonNormalText,
-                      fontSize: '11px',
-                      padding: '4px 8px',
-                      borderRadius: 3,
-                      height: 'auto',
-                      minHeight: 'auto',
-                    }}
-                  >
-                    <Trans>Request Location</Trans>
-                    <SvgLocation
-                      width={10}
-                      height={10}
-                      style={{ marginLeft: 4 }}
-                    />
-                  </Button>
-                ) : (
-                  dropdownChevron
-                )
-              }
-            />
-          </View>
-
-          {!transaction.is_parent && (
-            <View>
-              <FieldLabel title={t('Category')} />
-              <TapField
-                icon={<SvgTag width={17} height={17} />}
-                placeholder={t('Select a category')}
-                rightContent={dropdownChevron}
+            >
+              <Text
+                role="listitem"
+                aria-current={entryStep === 'amount' ? 'step' : undefined}
                 style={{
-                  ...((isOffBudget || isBudgetTransfer(transaction)) && {
-                    fontStyle: 'italic',
-                    color: theme.pageTextSubdued,
-                    fontWeight: 300,
-                  }),
+                  color:
+                    entryStep === 'amount'
+                      ? theme.pageTextPositive
+                      : theme.tableRowHeaderText,
+                  fontWeight: 600,
                 }}
-                value={getCategory(transaction, isOffBudget)}
-                isDisabled={
-                  (!!editingField &&
-                    editingField !==
-                      getFieldName(transaction.id, 'category')) ||
-                  isOffBudget ||
-                  isBudgetTransfer(transaction)
-                }
-                onPress={() => onEditFieldInner(transaction.id, 'category')}
-                data-testid="category-field"
+              >
+                <Trans>1. Amount</Trans>
+              </Text>
+              <View
+                aria-hidden="true"
+                style={{
+                  height: 1,
+                  flex: 1,
+                  backgroundColor: theme.tableBorder,
+                }}
               />
+              <Text
+                role="listitem"
+                aria-current={entryStep === 'details' ? 'step' : undefined}
+                style={{
+                  color:
+                    entryStep === 'details'
+                      ? theme.pageTextPositive
+                      : theme.tableRowHeaderText,
+                  fontWeight: 600,
+                }}
+              >
+                <Trans>2. Details</Trans>
+              </Text>
             </View>
           )}
-
-          {childTransactions.map((childTrans, i, arr) => (
-            <ChildTransactionEdit
-              key={childTrans.id}
-              transaction={childTrans}
-              negate={transaction.amount <= 0}
-              amountFocused={arr.findIndex(c => c.amount === 0) === i}
-              ref={r => {
-                childTransactionElementRefMap.current = {
-                  ...childTransactionElementRefMap.current,
-                  [childTrans.id]: r,
-                };
-              }}
-              isOffBudget={isOffBudget}
-              getCategory={getCategory}
-              getPayee={getPayee}
-              getTransferAccount={getTransferAccount}
-              isBudgetTransfer={isBudgetTransfer}
-              onUpdate={onUpdateInner}
-              onEditField={onEditFieldInner}
-              onDelete={onDeleteInner}
-              keyboardHeader={
-                <FillRemainingButton
-                  remaining={remaining}
-                  onPress={() => {
-                    void onUpdateInner(
-                      childTrans,
-                      'amount',
-                      integerToAmount(remaining),
-                    );
-                  }}
-                />
-              }
-            />
-          ))}
-
-          {transaction.amount !== 0 && childTransactions.length === 0 && (
-            <View style={{ alignItems: 'center' }}>
-              <Button
-                variant="bare"
-                isDisabled={!!editingField}
+          {entryStep === 'amount' && !isAdding ? (
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <TransactionAmountSection
+                key={transaction.id}
+                value={transaction.amount}
+                continueRequest={continueRequest}
+                initialIncome={incomeAtZero}
+                onTypeChange={setIncomeAtZero}
+                onContinue={() => setEntryStep('details')}
+                onEnter={() => setContinueRequest(request => request + 1)}
+                autoFocus={isAdding}
+                disableNativeAutoFocusOnIOS
+                onFocus={() =>
+                  onRequestActiveEdit(getFieldName(transaction.id, 'amount'))
+                }
+                onBlur={() => onClearActiveEdit()}
+                onChange={onTotalAmountUpdate}
+              />
+              <Text
                 style={{
-                  height: 40,
-                  borderWidth: 0,
-                  marginLeft: styles.mobileEditingPadding,
-                  marginRight: styles.mobileEditingPadding,
-                  marginTop: 10,
-                  backgroundColor: 'transparent',
+                  textAlign: 'center',
+                  color: theme.tableRowHeaderText,
+                  fontSize: 15,
+                  padding: '0 20px',
+                  lineHeight: 1.5,
                 }}
-                onPress={() => onSplit(transaction.id)}
               >
-                <SvgSplit
-                  width={17}
-                  height={17}
-                  style={{ color: theme.formLabelText }}
-                />
-                <Text
+                <Trans>Enter an amount, then add the details.</Trans>
+              </Text>
+            </View>
+          ) : (
+            <View
+              data-testid="transaction-details"
+              style={{
+                gap: 16,
+                colorScheme: 'light dark',
+                '[data-theme="dark"] &, [data-theme="midnight"] &': {
+                  colorScheme: 'dark',
+                },
+              }}
+            >
+              {!isAdding && (
+                <Button
+                  variant="bare"
+                  aria-label={t('Edit amount')}
+                  onPress={() => setEntryStep('amount')}
                   style={{
-                    marginLeft: 5,
-                    userSelect: 'none',
-                    color: theme.formLabelText,
+                    width: '100%',
+                    justifyContent: 'space-between',
+                    padding: '8px 4px 16px',
+                    borderRadius: 12,
+                    minHeight: 64,
                   }}
                 >
-                  <Trans>Split</Trans>
-                </Text>
-              </Button>
+                  <View style={{ alignItems: 'flex-start', gap: 4 }}>
+                    <Text
+                      style={{ color: theme.tableRowHeaderText, fontSize: 13 }}
+                    >
+                      {amountIsIncome ? (
+                        <Trans>Income</Trans>
+                      ) : (
+                        <Trans>Expense</Trans>
+                      )}
+                    </Text>
+                    <PrivacyFilter>
+                      <Text
+                        style={{
+                          ...styles.tnum,
+                          fontSize: 28,
+                          fontWeight: 600,
+                          color: theme.pageText,
+                        }}
+                      >
+                        {integerToCurrency(
+                          amountToInteger(Math.abs(transaction.amount)),
+                        )}
+                      </Text>
+                    </PrivacyFilter>
+                  </View>
+                  <Text style={{ color: theme.pageTextPositive, fontSize: 14 }}>
+                    <Trans>Edit amount</Trans>
+                  </Text>
+                </Button>
+              )}
+              <View
+                style={{
+                  border: `1px solid ${theme.tableBorder}`,
+                  borderRadius: 16,
+                  backgroundColor: theme.tableBackground,
+                  overflow: 'hidden',
+                }}
+              >
+                <TransactionEntryField
+                  ref={accountDropdownTrigger}
+                  label={t('Account')}
+                  icon={<SvgWallet width={20} height={20} />}
+                  value={account?.name}
+                  placeholder={t('Select an account')}
+                  data-testid="account-field"
+                  isDisabled={
+                    !!editingField &&
+                    editingField !== getFieldName(transaction.id, 'account')
+                  }
+                  onPress={() => onEditFieldInner(transaction.id, 'account')}
+                  aria-haspopup="dialog"
+                  aria-expanded={
+                    fieldDropdown?.transactionId === transaction.id &&
+                    fieldDropdown.field === 'account'
+                  }
+                />
+                <TransactionEntryField
+                  ref={payeeDropdownTrigger}
+                  label={t('Payee')}
+                  icon={<SvgUser width={20} height={20} />}
+                  value={title}
+                  placeholder={
+                    amountIsIncome ? t('Who paid you?') : t('Who did you pay?')
+                  }
+                  data-testid="payee-field"
+                  isDisabled={
+                    !!editingField &&
+                    editingField !== getFieldName(transaction.id, 'payee')
+                  }
+                  onPress={() => onEditFieldInner(transaction.id, 'payee')}
+                  aria-haspopup="dialog"
+                  aria-expanded={
+                    fieldDropdown?.transactionId === transaction.id &&
+                    fieldDropdown.field === 'payee'
+                  }
+                />
+                {!transaction.is_parent && (
+                  <TransactionEntryField
+                    ref={categoryDropdownTrigger}
+                    label={t('Category')}
+                    icon={<SvgTag width={20} height={20} />}
+                    value={getCategory(transaction, isOffBudget)}
+                    placeholder={t('Select a category')}
+                    data-testid="category-field"
+                    isDisabled={
+                      (!!editingField &&
+                        editingField !==
+                          getFieldName(transaction.id, 'category')) ||
+                      isOffBudget ||
+                      isBudgetTransfer(transaction)
+                    }
+                    onPress={() => onEditFieldInner(transaction.id, 'category')}
+                    aria-haspopup="dialog"
+                    aria-expanded={
+                      fieldDropdown?.transactionId === transaction.id &&
+                      fieldDropdown.field === 'category'
+                    }
+                  />
+                )}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '8px 16px',
+                    gap: 12,
+                    borderBottom: `1px solid ${theme.tableBorder}`,
+                  }}
+                >
+                  <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+                    <Text
+                      style={{ fontSize: 12, color: theme.tableRowHeaderText }}
+                    >
+                      <Trans>Date</Trans>
+                    </Text>
+                    <InputField
+                      type="date"
+                      aria-label={t('Date')}
+                      required
+                      disabled={
+                        !!editingField &&
+                        editingField !== getFieldName(transaction.id, 'date')
+                      }
+                      style={{
+                        margin: 0,
+                        border: 0,
+                        borderRadius: 0,
+                        height: 36,
+                        padding: 0,
+                        width: '100%',
+                        minWidth: 0,
+                        backgroundColor: 'transparent',
+                        fontSize: 15,
+                      }}
+                      defaultValue={dateDefaultValue}
+                      onBlur={() => onClearActiveEdit()}
+                      onFocus={() =>
+                        onRequestActiveEdit(
+                          getFieldName(transaction.id, 'date'),
+                        )
+                      }
+                      onChange={event =>
+                        onUpdateInner(
+                          transaction,
+                          'date',
+                          formatDate(parseISO(event.target.value), dateFormat),
+                        )
+                      }
+                    />
+                  </View>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      minHeight: 44,
+                      cursor: 'pointer',
+                      color: theme.pageText,
+                      fontSize: 13,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      aria-label={
+                        transaction.reconciled ? t('Reconciled') : t('Cleared')
+                      }
+                      checked={
+                        !!(transaction.reconciled || transaction.cleared)
+                      }
+                      disabled={!!editingField}
+                      onChange={() =>
+                        transaction.reconciled
+                          ? onUnlockReconciledInner(transaction)
+                          : onUpdateInner(
+                              transaction,
+                              'cleared',
+                              !transaction.cleared,
+                            )
+                      }
+                      style={{
+                        width: 22,
+                        height: 22,
+                        margin: 0,
+                        accentColor: theme.buttonPrimaryBackground,
+                      }}
+                    />
+                    {transaction.reconciled ? (
+                      <Trans>Reconciled</Trans>
+                    ) : (
+                      <Trans>Cleared</Trans>
+                    )}
+                  </label>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: '4px 8px',
+                  }}
+                >
+                  <Button
+                    variant="bare"
+                    aria-expanded={showNotes || !!transaction.notes}
+                    onPress={() => setShowNotes(show => !show)}
+                    style={{
+                      flex: 1,
+                      justifyContent: 'flex-start',
+                      minHeight: 48,
+                      gap: 12,
+                      padding: '0 8px',
+                      color: theme.tableRowHeaderText,
+                    }}
+                  >
+                    <SvgNotesPaper width={20} height={20} aria-hidden="true" />
+                    {showNotes || transaction.notes ? (
+                      <Trans>Notes</Trans>
+                    ) : (
+                      <Trans>Add a note</Trans>
+                    )}
+                  </Button>
+                  {shouldShowSaveLocation ? (
+                    <Button
+                      variant="bare"
+                      onPress={onSaveLocation}
+                      aria-label={t('Save location')}
+                      style={{ minHeight: 44, gap: 6 }}
+                    >
+                      <Trans>Save</Trans>
+                      <SvgLocation width={18} height={18} />
+                    </Button>
+                  ) : nearestPayee && !transaction.payee ? (
+                    <Button
+                      variant="bare"
+                      onPress={onSelectNearestPayee}
+                      style={{ minHeight: 44, gap: 6 }}
+                    >
+                      <Trans>Nearby</Trans>
+                      <SvgLocation width={18} height={18} />
+                    </Button>
+                  ) : onRequestLocation && !transaction.payee ? (
+                    <Button
+                      variant="bare"
+                      aria-label={t('Request Location')}
+                      onPress={onRequestLocation}
+                      style={{ minHeight: 44, minWidth: 44 }}
+                    >
+                      <SvgLocation width={18} height={18} />
+                    </Button>
+                  ) : null}
+                </View>
+                {(showNotes || !!transaction.notes) && (
+                  <View
+                    style={{
+                      padding: '0 8px 12px',
+                      '&& input::placeholder': {
+                        color: theme.tableRowHeaderText,
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    <InputField
+                      ref={noteRef}
+                      aria-label={t('Notes')}
+                      iconEnd={<NoteInsertHashButton inputRef={noteRef} />}
+                      placeholder={t('Add a note (optional)')}
+                      disabled={
+                        !!editingField &&
+                        editingField !== getFieldName(transaction.id, 'notes')
+                      }
+                      defaultValue={transaction.notes}
+                      onFocus={() =>
+                        onRequestActiveEdit(
+                          getFieldName(transaction.id, 'notes'),
+                        )
+                      }
+                      onBlur={() => onClearActiveEdit()}
+                      onChange={event =>
+                        onUpdateInner(transaction, 'notes', event.target.value)
+                      }
+                    />
+                    <NoteTagAutocomplete inputRef={noteRef} />
+                  </View>
+                )}
+              </View>
+              {!isAdding && (
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  <Button
+                    ref={transferDropdownTrigger}
+                    onPress={onTransfer}
+                    aria-haspopup="dialog"
+                    aria-controls={
+                      fieldDropdown?.field === 'transfer'
+                        ? 'transaction-field-dropdown'
+                        : undefined
+                    }
+                    aria-expanded={fieldDropdown?.field === 'transfer'}
+                    isDisabled={!!editingField}
+                    style={{
+                      minHeight: 48,
+                      flex: 1,
+                      gap: 8,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <SvgWallet width={18} height={18} />
+                    <Trans>Transfer</Trans>
+                  </Button>
+                  <Button
+                    onPress={() => onSplit(transaction.id)}
+                    isDisabled={
+                      !!editingField ||
+                      !!childTransactions.length ||
+                      transaction.amount === 0
+                    }
+                    style={{
+                      minHeight: 48,
+                      flex: 1,
+                      gap: 8,
+                      borderRadius: 12,
+                    }}
+                  >
+                    <SvgSplit width={18} height={18} />
+                    <Trans>Split</Trans>
+                  </Button>
+                </View>
+              )}
+              {childTransactions.map((childTrans, i, arr) => (
+                <ChildTransactionEdit
+                  key={childTrans.id}
+                  transaction={childTrans}
+                  negate={transaction.amount <= 0}
+                  amountFocused={arr.findIndex(c => c.amount === 0) === i}
+                  ref={r => {
+                    childTransactionElementRefMap.current = {
+                      ...childTransactionElementRefMap.current,
+                      [childTrans.id]: r,
+                    };
+                  }}
+                  isOffBudget={isOffBudget}
+                  getCategory={getCategory}
+                  getPayee={getPayee}
+                  getTransferAccount={getTransferAccount}
+                  isBudgetTransfer={isBudgetTransfer}
+                  onUpdate={onUpdateInner}
+                  onEditField={onEditFieldInner}
+                  onDelete={onDeleteInner}
+                  keyboardHeader={
+                    <FillRemainingButton
+                      remaining={remaining}
+                      onPress={() => {
+                        void onUpdateInner(
+                          childTrans,
+                          'amount',
+                          integerToAmount(remaining),
+                        );
+                      }}
+                    />
+                  }
+                />
+              ))}
             </View>
           )}
 
-          <View>
-            <FieldLabel title={t('Account')} />
-            <TapField
-              icon={<SvgWallet width={17} height={17} />}
-              placeholder={t('Select an account')}
-              rightContent={dropdownChevron}
-              isDisabled={
-                !!editingField &&
-                editingField !== getFieldName(transaction.id, 'account')
-              }
-              value={account?.name}
-              onPress={() => onEditFieldInner(transaction.id, 'account')}
-              data-testid="account-field"
-            />
-          </View>
-
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 1 }}>
-              <FieldLabel title={t('Date')} />
-              <InputField
-                type="date"
-                iconStart={<SvgCalendar width={17} height={17} />}
-                disabled={
-                  !!editingField &&
-                  editingField !== getFieldName(transaction.id, 'date')
-                }
-                required
-                style={{
-                  color: theme.tableText,
-                  minWidth: '150px',
-                  appearance: 'none',
-                }}
-                defaultValue={dateDefaultValue}
-                onBlur={() => onClearActiveEdit()}
-                onFocus={() =>
-                  onRequestActiveEdit(getFieldName(transaction.id, 'date'))
-                }
-                onChange={event =>
-                  onUpdateInner(
-                    transaction,
-                    'date',
-                    formatDate(parseISO(event.target.value), dateFormat),
-                  )
-                }
-              />
-            </View>
-            {transaction.reconciled ? (
-              <View style={{ alignItems: 'center' }}>
-                <FieldLabel title={t('Reconciled')} />
-                <ToggleField
-                  id="reconciled"
-                  isOn
-                  onToggle={() => onUnlockReconciledInner(transaction)}
-                />
-              </View>
-            ) : (
-              <View style={{ alignItems: 'center' }}>
-                <FieldLabel title={t('Cleared')} />
-                <ToggleField
-                  id="cleared"
-                  isOn={!!transaction.cleared}
-                  onToggle={on => onUpdateInner(transaction, 'cleared', on)}
-                />
-              </View>
-            )}
-          </View>
-
-          <View>
-            <FieldLabel title={t('Notes')} />
-            <InputField
-              ref={noteRef}
-              iconStart={<SvgNotesPaper width={17} height={17} />}
-              iconEnd={<NoteInsertHashButton inputRef={noteRef} />}
-              placeholder={t('Add a note (optional)')}
-              disabled={
-                !!editingField &&
-                editingField !== getFieldName(transaction.id, 'notes')
-              }
-              defaultValue={transaction.notes}
-              onFocus={() => {
-                onRequestActiveEdit(getFieldName(transaction.id, 'notes'));
-              }}
-              onBlur={() => onClearActiveEdit()}
-              onChange={event =>
-                onUpdateInner(transaction, 'notes', event.target.value)
-              }
-            />
-            <NoteTagAutocomplete inputRef={noteRef} />
-          </View>
-
-          {!isAdding && (
+          {!isAdding && entryStep === 'details' && (
             <View style={{ alignItems: 'center' }}>
               <Button
                 variant="bare"
@@ -1581,6 +1809,38 @@ const TransactionEditInner = memo<TransactionEditInnerProps>(
             </View>
           )}
         </View>
+        {fieldDropdown && dropdownTransaction && (
+          <TransactionFieldDropdown
+            key={`${fieldDropdown.transactionId}-${fieldDropdown.field}`}
+            anchor={fieldDropdown.anchor}
+            field={fieldDropdown.field}
+            account={transaction.account ?? undefined}
+            hasPayee={!!dropdownTransaction.payee}
+            date={
+              unserializedTransactions.find(
+                t => t.id === dropdownTransaction.id,
+              )?.date ?? monthUtils.currentDay()
+            }
+            categoryGroups={categoryGroups}
+            showHiddenCategories={showHiddenCategories ?? false}
+            onClose={closeDropdown}
+            onSelect={id => {
+              const field = fieldDropdown.field;
+              const value =
+                field === 'transfer'
+                  ? payees.find(payee => payee.transfer_acct === id)?.id
+                  : id;
+              closeDropdown();
+              if (value !== undefined) {
+                void onUpdateInner(
+                  dropdownTransaction,
+                  field === 'transfer' ? 'payee' : field,
+                  value,
+                );
+              }
+            }}
+          />
+        )}
       </Page>
     );
   },
@@ -1623,6 +1883,9 @@ function TransactionEditUnconnected({
   const isAdding = useRef(false);
   const isDeleted = useRef(false);
   const [learnCategories = 'true'] = useSyncedPref('learn-categories');
+  const [defaultTransactionAccount] = useSyncedPref(
+    'defaultTransactionAccount',
+  );
   const isLearnCategoriesEnabled = String(learnCategories) === 'true';
 
   const searchParamCategory = useMemo(
@@ -1708,6 +1971,7 @@ function TransactionEditUnconnected({
           account:
             searchParamAccount ||
             locationState?.accountId ||
+            defaultTransactionAccount ||
             lastTransaction?.account ||
             null,
           category: searchParamCategory || locationState?.categoryId || null,
@@ -1722,6 +1986,7 @@ function TransactionEditUnconnected({
   }, [
     locationState?.accountId,
     locationState?.categoryId,
+    defaultTransactionAccount,
     lastTransaction,
     searchParamAccount,
     searchParamCategory,

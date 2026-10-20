@@ -32,6 +32,7 @@ import {
 
 import { makeAmountFullStyle } from '#components/budget/util';
 import { TransferDirectionIcon } from '#components/common/TransferDirectionIcon';
+import { PrivacyFilter } from '#components/PrivacyFilter';
 import { useAccount } from '#hooks/useAccount';
 import { useCachedSchedules } from '#hooks/useCachedSchedules';
 import { useCategories } from '#hooks/useCategories';
@@ -308,34 +309,38 @@ export function TransactionListItem({
               )}
             </View>
             <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
-              <Text
-                style={{
-                  ...styles.tnum,
-                  ...makeAmountFullStyle(amount, {
-                    positiveColor: theme.tableText,
-                    negativeColor: theme.tableText,
-                    zeroColor: theme.numberNeutral,
-                  }),
-                  ...textStyle,
-                }}
-              >
-                {integerToCurrency(amount)}
-              </Text>
-              {showRunningBalance && runningBalance !== undefined && (
+              <PrivacyFilter>
                 <Text
                   style={{
-                    fontSize: 11,
-                    fontWeight: '400',
                     ...styles.tnum,
-                    ...makeAmountFullStyle(runningBalance, {
-                      positiveColor: theme.numberPositive,
-                      negativeColor: theme.numberNegative,
+                    ...makeAmountFullStyle(amount, {
+                      positiveColor: theme.tableText,
+                      negativeColor: theme.tableText,
                       zeroColor: theme.numberNeutral,
                     }),
+                    ...textStyle,
                   }}
                 >
-                  {integerToCurrency(runningBalance)}
+                  {integerToCurrency(amount)}
                 </Text>
+              </PrivacyFilter>
+              {showRunningBalance && runningBalance !== undefined && (
+                <PrivacyFilter>
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      fontWeight: '400',
+                      ...styles.tnum,
+                      ...makeAmountFullStyle(runningBalance, {
+                        positiveColor: theme.numberPositive,
+                        negativeColor: theme.numberNegative,
+                        zeroColor: theme.numberNeutral,
+                      }),
+                    }}
+                  >
+                    {integerToCurrency(runningBalance)}
+                  </Text>
+                </PrivacyFilter>
               )}
             </View>
           </View>

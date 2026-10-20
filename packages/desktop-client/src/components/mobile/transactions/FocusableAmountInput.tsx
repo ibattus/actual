@@ -26,6 +26,7 @@ import { useSyncedPref } from '#hooks/useSyncedPref';
 
 type AmountInputProps = {
   value: number;
+  'aria-label'?: string;
   focused?: boolean;
   style?: CSSProperties;
   textStyle?: CSSProperties;
@@ -135,6 +136,7 @@ const AmountInput = memo(function AmountInput({
       onFocus={onFocus}
       onBlur={onBlur}
       onKeyUp={onKeyUp}
+      aria-label={props['aria-label']}
       data-testid="amount-input"
       style={{ flex: 1, textAlign: 'center', position: 'absolute' }}
     />
@@ -170,6 +172,7 @@ const AmountInput = memo(function AmountInput({
 export type FocusableAmountInputProps = Omit<AmountInputProps, 'onFocus'> & {
   sign?: '+' | '-';
   zeroSign?: '+' | '-';
+  hideSignToggle?: boolean;
   focused?: boolean;
   disabled?: boolean;
   focusedStyle?: CSSProperties;
@@ -177,12 +180,14 @@ export type FocusableAmountInputProps = Omit<AmountInputProps, 'onFocus'> & {
     style?: EmotionCSSProperties;
   };
   onFocus?: (event?: FocusEvent<HTMLInputElement>) => void;
+  onAmountPress?: () => void;
 };
 
 export const FocusableAmountInput = memo(function FocusableAmountInput({
   value,
   sign,
   zeroSign,
+  hideSignToggle = false,
   focused,
   disabled,
   textStyle,
@@ -190,6 +195,7 @@ export const FocusableAmountInput = memo(function FocusableAmountInput({
   focusedStyle,
   buttonProps,
   onFocus,
+  onAmountPress,
   onBlur,
   onChangeValue,
   ...props
@@ -219,8 +225,10 @@ export const FocusableAmountInput = memo(function FocusableAmountInput({
   useEffect(() => {
     if (sign) {
       setIsNegative(sign === '-');
-    } else if (value > 0 || (zeroSign !== '-' && value === 0)) {
-      setIsNegative(false);
+    } else if (value === 0) {
+      setIsNegative(zeroSign === '-');
+    } else {
+      setIsNegative(value < 0);
     }
   }, [sign, value, zeroSign]);
 
@@ -261,7 +269,7 @@ export const FocusableAmountInput = memo(function FocusableAmountInput({
       />
 
       <View>
-        {!focused && (
+        {!focused && !hideSignToggle && (
           <Button
             style={{
               position: 'absolute',
@@ -274,7 +282,10 @@ export const FocusableAmountInput = memo(function FocusableAmountInput({
           </Button>
         )}
         <Button
-          onPress={() => onFocus?.()}
+          onPress={() => {
+            onAmountPress?.();
+            onFocus?.();
+          }}
           // Defines how far touch can start away from the button
           // hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           {...buttonProps}
@@ -291,13 +302,14 @@ export const FocusableAmountInput = memo(function FocusableAmountInput({
             style={{
               borderTopWidth: 1,
               borderBottomWidth: 1,
-              borderColor: '#e0e0e0',
+              borderColor: theme.formInputBorder,
               borderTopColor: 'transparent',
               justifyContent: 'center',
               ...style,
             }}
           >
             <Text
+              data-testid="focusable-amount-display"
               style={{
                 ...makeAmountFullStyle(value, {
                   positiveColor: theme.numberPositive,

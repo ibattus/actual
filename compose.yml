@@ -1,0 +1,24 @@
+services:
+  actual-server:
+    build:
+      context: .
+      dockerfile: sync-server.Dockerfile
+    image: actual-local:latest
+    restart: unless-stopped
+    environment:
+      ACTUAL_HOSTNAME: 0.0.0.0
+      ACTUAL_PORT: 5006
+    ports:
+      - '0.0.0.0:9902:5006'
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5006/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

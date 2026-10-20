@@ -25,7 +25,36 @@ export class MobileTransactionEntryPage {
     await this.transactionForm.waitFor(...options);
   }
 
+  async focusAmount() {
+    if (await this.page.getByTestId('transaction-details').isVisible()) {
+      const editAmount = this.page.getByRole('button', {
+        name: 'Edit amount',
+        exact: true,
+      });
+      if (await editAmount.isVisible()) {
+        await editAmount.click();
+      }
+    }
+    await this.page.getByTestId('transaction-amount-section').waitFor();
+    if (!(await this.amountField.isVisible())) {
+      await this.page
+        .getByTestId('transaction-amount')
+        .getByRole('button')
+        .click();
+    }
+  }
+
+  async continueToDetails() {
+    if (!(await this.page.getByTestId('transaction-details').isVisible())) {
+      await this.page
+        .getByRole('button', { name: 'Continue', exact: true })
+        .click();
+      await this.page.getByTestId('transaction-details').waitFor();
+    }
+  }
+
   async fillAmount(value: string) {
+    await this.focusAmount();
     await this.amountField.fill(value);
     await this.amountField.evaluate(el => (el as HTMLInputElement).blur());
     // TransactionEdit.onUpdate runs an async rules-run before setTransactions,
@@ -38,6 +67,7 @@ export class MobileTransactionEntryPage {
   }
 
   async fillField(fieldLocator: Locator, content: string) {
+    await this.continueToDetails();
     await fieldLocator.click();
     const comboboxInput = this.page.getByRole('combobox').locator('input');
     // pressSequentially + option click: fill()+Enter breaks the autocomplete
@@ -53,6 +83,7 @@ export class MobileTransactionEntryPage {
   }
 
   async createTransaction() {
+    await this.continueToDetails();
     await this.addTransactionButton.click();
 
     return new MobileAccountPage(this.page);

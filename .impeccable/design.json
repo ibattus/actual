@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T07:49:59.826563+00:00",
+  "title": "Design System: Actual Budget",
+  "extensions": {
+    "colorMeta": {
+      "actual-purple": {
+        "role": "primary",
+        "displayName": "Actual Purple"
+      },
+      "navy-frost": {
+        "role": "neutral",
+        "displayName": "Navy Frost",
+        "purpose": "Light-theme mobile page and neutral header; semantic mobile roles remap in dark and midnight."
+      },
+      "page-text": {
+        "role": "neutral",
+        "displayName": "Page Ink"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Existing large balances and headings."
+      },
+      "mobile-amount": {
+        "displayName": "Mobile amount",
+        "purpose": "Amount-step input, fitted to the formatted amount and viewport from 20px to 52px, using tabular figures."
+      },
+      "mobile-header": {
+        "displayName": "Mobile header",
+        "purpose": "Shared centered page heading."
+      },
+      "mobile-navigation": {
+        "displayName": "Mobile navigation",
+        "purpose": "Bottom navigation labels; active weight is 600."
+      },
+      "mobile-amount-summary": {
+        "displayName": "Mobile amount summary",
+        "purpose": "Compact 28px amount on Details; Edit amount returns to the first step."
+      },
+      "privacy-redaction": {
+        "displayName": "Privacy redaction",
+        "purpose": "Existing Redacted Script face for hidden financial values at rest. Focused financial inputs are readable; mobile overlays do not reveal on hover."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-utility",
+        "value": "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
+        "purpose": "Existing shared card shadow utility; renovated mobile groups remain flat."
+      },
+      {
+        "name": "ambient",
+        "value": "0 2px 4px 0 rgba(0,0,0,0.1)",
+        "purpose": "Shared hover lift and big inputs."
+      },
+      {
+        "name": "large",
+        "value": "0 15px 30px 0 rgba(0,0,0,0.11), 0 5px 15px 0 rgba(0,0,0,0.08)",
+        "purpose": "Popovers, tooltips, and floating panels."
+      },
+      {
+        "name": "sheet",
+        "value": "0 -4px 24px rgba(0,0,0,0.2)",
+        "purpose": "Mobile sheet elevation."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-shadow",
+        "value": "box-shadow .25s",
+        "purpose": "Existing shared button hover feedback; pressed state disables this transition."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "small",
+        "value": "512px"
+      },
+      {
+        "name": "medium",
+        "value": "730px"
+      },
+      {
+        "name": "wide",
+        "value": "1100px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "description": "Shared compact primary action; default geometry remains appropriate for desktop.",
+      "html": "<button class=\"ds-button-primary\">Save changes</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;border-radius:4px;padding:5px 10px;font-size:13px;transition:box-shadow .25s;font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;background:var(--color-buttonPrimaryBackground);color:var(--color-buttonPrimaryText);border:1px solid var(--color-buttonPrimaryBorder);}.ds-button-primary:hover{background:var(--color-buttonPrimaryBackgroundHover);color:var(--color-buttonPrimaryTextHover);box-shadow:0 2px 4px 0 rgba(0,0,0,0.1);}.ds-button-primary:active{transform:translateY(1px);box-shadow:0 1px 4px 0 var(--color-buttonPrimaryShadow);transition:none;}.ds-button-primary:focus-visible{outline:auto;}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Normal button",
+      "kind": "button",
+      "description": "Shared compact normal action; default geometry remains appropriate for desktop.",
+      "html": "<button class=\"ds-button-normal\">Cancel</button>",
+      "css": ".ds-button-normal{display:inline-flex;align-items:center;justify-content:center;border-radius:4px;padding:5px 10px;font-size:13px;transition:box-shadow .25s;font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;background:var(--color-buttonNormalBackground);color:var(--color-buttonNormalText);border:1px solid var(--color-buttonNormalBorder);}.ds-button-normal:hover{background:var(--color-buttonNormalBackgroundHover);color:var(--color-buttonNormalTextHover);box-shadow:0 2px 4px 0 rgba(0,0,0,0.1);}.ds-button-normal:active{transform:translateY(1px);box-shadow:0 1px 4px 0 var(--color-buttonNormalShadow);transition:none;}.ds-button-normal:focus-visible{outline:auto;}",
+      "refersTo": "button-normal"
+    },
+    {
+      "name": "Bare button",
+      "kind": "button",
+      "description": "Shared compact bare action; default geometry remains appropriate for desktop.",
+      "html": "<button class=\"ds-button-bare\">Details</button>",
+      "css": ".ds-button-bare{display:inline-flex;align-items:center;justify-content:center;border-radius:4px;padding:5px 10px;font-size:13px;transition:box-shadow .25s;font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;background:var(--color-buttonBareBackground);color:var(--color-buttonBareText);border:none;padding:5px;}.ds-button-bare:hover{background:var(--color-buttonBareBackgroundHover);color:var(--color-buttonBareTextHover);}.ds-button-bare:active{background:var(--color-buttonBareBackgroundActive);}.ds-button-bare:focus-visible{outline:auto;}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "description": "Compact shared field with semantic selected border and focus shadow.",
+      "html": "<input class=\"ds-input\" aria-label=\"Payee\" placeholder=\"Payee\">",
+      "css": ".ds-input{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;background:var(--color-tableBackground);color:var(--color-formInputText);padding:5px;border-radius:4px;border:1px solid var(--color-formInputBorder);font-size:13px;outline:0;}.ds-input:focus-visible,.ds-input:focus{border-color:var(--color-formInputBorderSelected);box-shadow:0 1px 1px var(--color-formInputShadowSelected);}.ds-input::placeholder{color:var(--color-formInputTextPlaceholder);}",
+      "refersTo": "input"
+    },
+    {
+      "name": "Editor pill",
+      "kind": "chip",
+      "description": "Existing rule-editor token, with compact corners and tinted semantic surface.",
+      "html": "<span class=\"ds-pill\">Category</span>",
+      "css": ".ds-pill{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;display:inline-block;color:var(--color-pillText);background:var(--color-pillBackground);border-radius:4px;padding:3px 5px;font-size:13px;}"
+    },
+    {
+      "name": "Mobile surface",
+      "kind": "card",
+      "description": "Flat bordered group used by mobile accounts and budget cards; square rows sit inside clipped rounded corners.",
+      "html": "<div class=\"ds-mobile-card\"><div class=\"ds-mobile-card-row\">Checking <span class=\"ds-mobile-card-money\">1,250.00</span></div></div>",
+      "css": ".ds-mobile-card{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;background:var(--color-tableBackground);border:1px solid var(--color-tableBorder);border-radius:16px;overflow:hidden;box-shadow:none;color:var(--color-pageText);}.ds-mobile-card-row{display:flex;justify-content:space-between;padding:16px;gap:12px;}.ds-mobile-card-money{font-feature-settings:\"tnum\",\"ss01\",\"ss04\";}"
+    },
+    {
+      "name": "Mobile transaction detail row",
+      "kind": "custom",
+      "description": "Persistent 12px label and 15px value inside a flat 16px group; rows are square and at least 68px tall.",
+      "html": "<div class=\"ds-entry-group\"><button class=\"ds-entry-row\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M0 4c0-1.1.9-2 2-2h15a1 1 0 0 1 1 1v1H2v1h17a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm16.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3\" fill=\"currentColor\"/></svg><span class=\"ds-entry-copy\"><span class=\"ds-entry-label\">Account</span><span class=\"ds-entry-value\">Checking</span></span><svg width=\"14\" height=\"14\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"m7 4 6 6-6 6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/></svg></button></div>",
+      "css": ".ds-entry-group{background:var(--color-tableBackground);border:1px solid var(--color-tableBorder);border-radius:16px;overflow:hidden;}.ds-entry-row{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;display:flex;align-items:center;width:100%;min-height:68px;padding:12px 16px;gap:14px;border:0;border-radius:0;border-bottom:1px solid var(--color-tableBorder);background:transparent;text-align:left;color:var(--color-tableRowHeaderText);}.ds-entry-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;}.ds-entry-label{font-size:12px;font-weight:500;}.ds-entry-value{font-size:15px;font-weight:600;color:var(--color-pageText);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.ds-entry-row:hover{background:var(--color-buttonBareBackgroundHover);}.ds-entry-row:active{background:var(--color-buttonBareBackgroundActive);}.ds-entry-row:focus-visible{outline:2px solid var(--color-formInputBorderSelected);outline-offset:-2px;}",
+      "refersTo": "mobile-entry-row"
+    },
+    {
+      "name": "Mobile page header",
+      "kind": "custom",
+      "description": "Neutral shared header, centered title, and safe-area-aware horizontal padding.",
+      "html": "<header class=\"ds-mobile-header\"><span class=\"ds-mobile-header-side\"></span><h1 class=\"ds-mobile-header-title\">Accounts</h1><span class=\"ds-mobile-header-side\"></span></header>",
+      "css": ".ds-mobile-header{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;display:flex;align-items:center;height:56px;background:var(--color-mobileHeaderBackground);color:var(--color-mobileHeaderText);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);}.ds-mobile-header-side{min-width:44px;}.ds-mobile-header-title{flex:1;min-width:0;margin:0;text-align:center;font-size:20px;font-weight:600;}",
+      "refersTo": "mobile-header"
+    },
+    {
+      "name": "Mobile navigation",
+      "kind": "nav",
+      "description": "Four equal primary targets; More opens the privacy toggle, Reports, Schedules, and Settings in the application. This preview depicts the label and icon treatment.",
+      "html": "<nav class=\"ds-mobile-nav\" aria-label=\"Main navigation\"><a class=\"ds-mobile-nav-item\" href=\"/budget\" aria-current=\"page\"><span class=\"ds-mobile-nav-icon\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path\n      d=\"M0 4c0-1.1.9-2 2-2h15a1 1 0 0 1 1 1v1H2v1h17a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm16.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3\"\n      fill=\"currentColor\"\n    /></svg></span><span>Budget</span></a><a class=\"ds-mobile-nav-item\" href=\"/accounts\"><span class=\"ds-mobile-nav-icon\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path\n        fill=\"currentColor\"\n        d=\"M1.857 7.612H.98a.98.98 0 0 0-.98.98v2.224c0 .449.184.857.51 1.163.612.551 1.816 1.49 3.735 2.368a.57.57 0 0 1 .306.346l.939 3.286a.484.484 0 0 0 .469.347h1.47a.48.48 0 0 0 .469-.367l.47-1.817a.26.26 0 0 1 .326-.183c.571.122 1.183.163 1.795.163.613 0 1.225-.061 1.796-.163.143-.02.286.06.327.183l.47 1.817a.5.5 0 0 0 .468.367h1.47a.484.484 0 0 0 .47-.347l1.224-4.245a.5.5 0 0 1 .122-.224c.919-.98 1.53-2.163 1.735-3.47h.49c.53 0 .959-.448.938-.979-.02-.51-.47-.918-.98-.918h-.448C18.06 4.673 14.632 2 10.489 2c-1.775 0-3.428.49-4.755 1.326-.591-.408-1.469-.734-2.693-.632-.49.04-.715.612-.388.959.408.429.796 1 .877 1.735zm3.122.98a.86.86 0 0 1-.857-.858c0-.469.388-.857.857-.857.47 0 .858.388.858.857 0 .47-.388.858-.858.858\"\n      /></svg></span><span>Accounts</span></a><a class=\"ds-mobile-nav-item\" href=\"/transactions/new\"><span class=\"ds-mobile-nav-icon ds-mobile-nav-add\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path\n      fill=\"currentColor\"\n      d=\"M23 11.5a1.5 1.5 0 0 1-1.5 1.5h-20a1.5 1.5 0 0 1 0-3h20a1.5 1.5 0 0 1 1.5 1.5\"\n    /><path\n      fill=\"currentColor\"\n      d=\"M11.5 23a1.5 1.5 0 0 1-1.5-1.5v-20a1.5 1.5 0 0 1 3 0v20a1.5 1.5 0 0 1-1.5 1.5\"\n    /></svg></span><span>Add</span></a><a class=\"ds-mobile-nav-item\" href=\"/more\"><span class=\"ds-mobile-nav-icon\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M0 3h20v2H0zm0 6h20v2H0zm0 6h20v2H0z\" fill=\"currentColor\" /></svg></span><span>More</span></a></nav>",
+      "css": ".ds-mobile-nav{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;display:flex;align-items:center;background:var(--color-mobileNavBackground);border-top:1px solid var(--color-menuBorder);height:calc(72px + env(safe-area-inset-bottom,0px));padding:3px max(4px,env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) max(4px,env(safe-area-inset-left,0px));}.ds-mobile-nav-item{flex:1 1 0;min-width:0;min-height:64px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;line-height:16px;color:var(--color-pageText);border-radius:12px;text-decoration:none;}.ds-mobile-nav-item[aria-current=\"page\"]{color:var(--color-mobileNavItemSelected);font-weight:600;}.ds-mobile-nav-item:hover,.ds-mobile-nav-item:active{text-decoration:underline;text-underline-offset:3px;}.ds-mobile-nav-item:focus-visible{outline:2px solid var(--color-mobileNavItemSelected);outline-offset:-2px;}.ds-mobile-nav-icon{display:flex;width:44px;height:32px;align-items:center;justify-content:center;}.ds-mobile-nav-add{background:var(--color-buttonPrimaryBackground);color:var(--color-buttonPrimaryText);border-radius:12px;}",
+      "refersTo": "mobile-navigation"
+    },
+    {
+      "name": "Guided mobile amount step",
+      "kind": "custom",
+      "description": "Amount precedes transaction details; type selection follows the fitted 20–52px number, with a separate Continue action.",
+      "html": "<section class=\"ds-amount-step\"><ol class=\"ds-entry-steps\" aria-label=\"Transaction steps\"><li aria-current=\"step\">1. Amount</li><li class=\"ds-entry-step-line\" aria-hidden=\"true\"></li><li>2. Details</li></ol><div class=\"ds-amount-section\"><input class=\"ds-amount-number\" aria-label=\"Amount\" value=\"24.50\" inputmode=\"decimal\"><div class=\"ds-amount-types\" role=\"group\" aria-label=\"Transaction type\"><button class=\"ds-amount-type\" aria-pressed=\"true\">Expense</button><button class=\"ds-amount-type\" aria-pressed=\"false\">Income</button></div></div><p class=\"ds-amount-help\">Enter an amount, then add the details.</p><footer class=\"ds-amount-footer\"><button class=\"ds-amount-continue\">Continue</button></footer></section>",
+      "css": ".ds-amount-step{font-family:\"Inter Variable\",-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,sans-serif;color:var(--color-pageText);background:var(--color-mobilePageBackground);max-width:560px;padding:12px;}.ds-entry-steps{display:flex;align-items:center;gap:12px;list-style:none;margin:0;padding:4px 4px 16px;font-size:13px;font-weight:600;color:var(--color-tableRowHeaderText);}.ds-entry-steps [aria-current=\"step\"]{color:var(--color-pageTextPositive);}.ds-entry-step-line{flex:1;height:1px;background:var(--color-tableBorder);}.ds-amount-section{display:flex;flex-direction:column;align-items:center;gap:24px;padding:32px 0;}.ds-amount-number{font-family:inherit;max-width:100%;width:100%;min-height:82px;border:0;border-bottom:2px solid transparent;outline:0;background:transparent;text-align:center;font-size:52px;font-weight:600;letter-spacing:-.03em;font-feature-settings:\"tnum\",\"ss01\",\"ss04\";color:var(--color-pageText);}.ds-amount-number:focus-visible{border-bottom-color:var(--color-formInputBorderSelected);}.ds-amount-types{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--color-tableBackground);border:1px solid var(--color-tableBorder);width:244px;max-width:100%;}.ds-amount-type{font-family:inherit;flex:1;min-height:44px;border:1px solid transparent;border-radius:8px;font-size:14px;font-weight:600;padding:5px;color:var(--color-tableRowHeaderText);background:transparent;}.ds-amount-type[aria-pressed=\"true\"]{color:var(--color-pageTextPositive);background:var(--color-pillBackgroundLight);border-color:var(--color-tableBorder);}.ds-amount-type:hover{cursor:pointer;background:var(--color-buttonBareBackgroundHover);}.ds-amount-type:active{background:var(--color-buttonBareBackgroundActive);}.ds-amount-type:focus-visible{outline:2px solid var(--color-formInputBorderSelected);}.ds-amount-help{text-align:center;font-size:15px;line-height:1.5;padding:0 20px;color:var(--color-tableRowHeaderText);}.ds-amount-footer{padding:24px 4px 0;}.ds-amount-continue{font-family:inherit;width:100%;min-height:52px;border-radius:14px;border:1px solid var(--color-buttonPrimaryBorder);font-size:16px;background:var(--color-buttonPrimaryBackground);color:var(--color-buttonPrimaryText);}.ds-amount-continue:hover{background:var(--color-buttonPrimaryBackgroundHover);}.ds-amount-continue:active{box-shadow:0 1px 4px 0 var(--color-buttonPrimaryShadow);}.ds-amount-continue:focus-visible{outline:auto;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Home Office",
+    "overview": "Actual feels like a tidy personal desk: familiar, unpretentious, everything within reach. It is a tool people open weekly for years to reconcile accounts and move envelope money around, so the interface optimizes for routine, not first impressions. Density is moderate-to-high (this is a table-driven app), feedback is instant, and decoration is close to zero. The financial numbers are the interface; everything else exists to keep them legible and trustworthy.\n\nThe system explicitly rejects fintech-startup gloss (gradient heroes, glassmorphism, crypto-dashboard neon) and corporate banking UI (navy-and-gold enterprise-portal density). It is calm, trustworthy, and practical, and it must render identically well in three themes: light, dark, and midnight.\n\nMobile extends this world as a **daily money journal**: neutral headers, touch-sized forms, rounded groups, and a prominent amount make everyday money tasks easy to scan on a phone. This approved mobile language shares Inter, semantic colors, real icons, and tabular figures with the desktop system; it does not replace the desktop's compact table geometry.",
+    "keyCharacteristics": [
+      "Table-first desktop layouts and grouped mobile forms, with tabular numerals everywhere money appears",
+      "One accent (Actual Purple) used sparingly for primary actions and selection",
+      "Semantic color tokens only; components never hardcode hex values",
+      "Compact desktop components and roomier mobile controls built for daily repetition",
+      "Flat-first surfaces; mobile groups use borders, while existing shared cards retain their small resting shadow"
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Token Rule",
+        "body": "Components never use raw palette values or hex codes. Every color goes through the `theme.*` semantic layer (`--color-*` custom properties) so all three themes (light, dark, midnight) stay correct. A hardcoded hex in a component is a bug.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Accent Rule",
+        "body": "Reserve Actual Purple for primary action, current selection, and active navigation. Mobile page headers use `mobileHeaderBackground`, which resolves to `mobilePageBackground`; header text uses the normal page text role. Do not turn the shared mobile header into an accent banner.",
+        "section": "colors"
+      },
+      {
+        "name": "The Never-Color-Alone Rule",
+        "body": "Positive/negative money state is conveyed by sign and context as well as color; green/red are reinforcement, never the only signal.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Number Rule",
+        "body": "Every standalone financial figure renders with `font-feature-settings: \"tnum\", \"ss01\", \"ss04\"` (via `FinancialText` or `styles.tnum`) so digits align in columns and disambiguate. A proportional-figure money column is a bug.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Mobile Surface Rule",
+        "body": "Renovated mobile groups use semantic borders and surface colors without resting shadows. Preserve the established shared-card shadow where existing desktop components use it; overlays may use the shadow vocabulary above.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Surface Scope Rule",
+        "body": "Apply the larger mobile geometry to mobile surfaces explicitly. Keep the shared compact defaults intact for desktop.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do route every color through `theme.*` semantic tokens so light, dark, and midnight themes all work. Test all three.",
+      "Do wrap standalone financial numbers in `FinancialText` or apply `styles.tnum`.",
+      "Do preserve the two-step mobile transaction sequence, persistent field labels, and fixed Continue/save actions when extending this editor.",
+      "Do use the existing privacy preference and Redacted Script treatment; keep focused financial inputs readable.",
+      "Do retain compact desktop defaults (4px controls, 5–10px padding) and apply the mobile geometry explicitly (12–16px grouped surfaces, 44–52px task controls).",
+      "Do reuse the existing component library (`@actual-app/components`) before writing new UI.",
+      "Do keep Actual Purple scarce: primary action and selection only.",
+      "Do respect the breakpoints: 512px (small), 730px (medium), 1100px (wide); mobile touch targets are at least 40px tall."
+    ],
+    "donts": [
+      "Don't use fintech-startup gloss: gradient heroes, glassmorphism, neon accents, crypto-dashboard styling (PRODUCT.md anti-reference).",
+      "Don't use corporate banking UI patterns: navy-and-gold, enterprise-portal density, legalese energy (PRODUCT.md anti-reference).",
+      "Don't hardcode hex values or raw `--palette-*` colors in components; the semantic layer is the only entry point.",
+      "Don't rely on color alone for positive/negative amounts.",
+      "Don't add resting shadows to renovated mobile groups; preserve the shared card's existing desktop treatment.",
+      "Don't use `border-left`/`border-right` thicker than 1px as a colored accent stripe.",
+      "Don't animate layout properties; transitions are for color, opacity, and shadow (like the button's `box-shadow .25s`)."
+    ]
+  }
+}

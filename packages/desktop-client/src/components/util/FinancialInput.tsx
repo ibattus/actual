@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { FocusEvent, MouseEvent } from 'react';
 
-import { useResponsive } from '@actual-app/components/hooks/useResponsive';
 import { Input } from '@actual-app/components/input';
 import type { InputProps } from '@actual-app/components/input';
 import { styles } from '@actual-app/components/styles';
@@ -15,7 +14,10 @@ import { usePrivacyMode } from '#hooks/usePrivacyMode';
 // reveal affordance as PrivacyFilter: squiggles at rest, readable while
 // hovered or being edited
 const REDACTED_INPUT_CLASS = css({
-  '&:not(:focus):not(:hover)': { fontFamily: 'Redacted Script' },
+  '&:not(:focus)': { fontFamily: 'Redacted Script' },
+  '@media (hover: hover) and (pointer: fine)': {
+    '&:not(:focus):hover': { fontFamily: 'inherit' },
+  },
 });
 
 type FinancialInputProps = Omit<
@@ -43,8 +45,6 @@ export function FinancialInput({
 }: FinancialInputProps) {
   const format = useFormat();
   const privacyMode = usePrivacyMode();
-  // Like PrivacyFilter, redaction is desktop-only for now
-  const { isNarrowWidth } = useResponsive();
   const inputRef = useRef<HTMLInputElement>(null);
   // A mouse-down is in progress; when that is what focuses the field,
   // the first mouse-up is cancelled so the click keeps the whole value
@@ -144,7 +144,7 @@ export function FinancialInput({
       ref={setInputRef}
       value={internalValue || ''}
       className={
-        privacyMode && !isNarrowWidth
+        privacyMode
           ? // The caller's className may be react-aria's function form, so
             // compose through it rather than assuming a string
             renderProps =>

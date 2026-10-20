@@ -60,24 +60,19 @@ test.describe('Mobile Transactions', () => {
       transactionEntryPage.page.url() +
         '?category=Food&amount=23.42&account=HSBC&date=2025-10-31&cleared=true&payee=Kroger&notes=just+a+note',
     );
-    await expect(page.getByTestId('transaction-form'))
-      .toMatchAriaSnapshot(`- text: Amount
-- textbox
-- text: 23.42 Payee
-- button "Kroger" [disabled]
-- text: Category
-- button "Food" [disabled]
-- button "Split" [disabled]:
-  - img
-  - text: Split
-- text: Account
-- button "HSBC" [disabled]
-- text: Date
-- textbox [disabled]: 2025-10-31
-- text: Cleared
-- checkbox [checked]
-- text: Notes
-- textbox [disabled]: just a note`);
+    await expect(
+      page.getByRole('button', { name: 'Expense', exact: true }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('amount-input-text')).toHaveText('23.42');
+    await transactionEntryPage.continueToDetails();
+    await expect(page.getByTestId('payee-field')).toContainText('Kroger');
+    await expect(page.getByTestId('category-field')).toContainText('Food');
+    await expect(page.getByTestId('account-field')).toContainText('HSBC');
+    await expect(page.locator('input[type="date"]')).toHaveValue('2025-10-31');
+    await expect(page.getByRole('checkbox')).toBeChecked();
+    await expect(page.getByPlaceholder('Add a note (optional)')).toHaveValue(
+      'just a note',
+    );
   });
 
   test('removes the payee from a new transaction', async () => {

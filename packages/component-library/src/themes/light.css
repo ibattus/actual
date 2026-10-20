@@ -119,9 +119,9 @@
 
   --color-modalBackground: var(--palette-white);
   --color-modalBorder: var(--palette-white);
-  --color-mobileHeaderBackground: var(--palette-purple400);
-  --color-mobileHeaderText: var(--palette-navy50);
-  --color-mobileHeaderTextSubdued: var(--palette-gray200);
+  --color-mobileHeaderBackground: var(--color-mobilePageBackground);
+  --color-mobileHeaderText: var(--color-pageText);
+  --color-mobileHeaderTextSubdued: var(--color-pageTextSubdued);
   --color-mobileHeaderTextHover: rgba(200, 200, 200, 0.15);
   --color-mobilePageBackground: var(--palette-navy50);
   --color-mobileNavBackground: var(--palette-white);

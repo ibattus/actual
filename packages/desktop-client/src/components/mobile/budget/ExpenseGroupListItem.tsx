@@ -82,9 +82,14 @@ export function ExpenseGroupListItem({
   return (
     <GridListItem textValue={categoryGroup.name} {...props}>
       <Card
+        radius={16}
         style={{
-          marginTop: 4,
-          marginBottom: 4,
+          marginTop: 6,
+          marginBottom: 6,
+          marginLeft: 10,
+          marginRight: 10,
+          boxShadow: 'none',
+          border: `1px solid ${theme.tableBorder}`,
         }}
       >
         <ExpenseGroupHeader

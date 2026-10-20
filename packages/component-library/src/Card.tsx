@@ -4,10 +4,10 @@ import type { ComponentProps } from 'react';
 import { theme } from './theme';
 import { View } from './View';
 
-type CardProps = ComponentProps<typeof View>;
+type CardProps = ComponentProps<typeof View> & { radius?: number };
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ children, ...props }, ref) => {
+  ({ children, radius = 6, ...props }, ref) => {
     return (
       <View
         {...props}
@@ -16,7 +16,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           marginTop: 15,
           marginLeft: 5,
           marginRight: 5,
-          borderRadius: 6,
+          borderRadius: radius,
           backgroundColor: theme.cardBackground,
           borderColor: theme.cardBorder,
           boxShadow: '0 1px 2px #9594A8',
@@ -25,7 +25,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       >
         <View
           style={{
-            borderRadius: 6,
+            borderRadius: radius,
             overflow: 'hidden',
           }}
         >

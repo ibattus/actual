@@ -1,4 +1,3 @@
-import { expect } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 import { MobileAccountPage } from './mobile-account-page';
@@ -12,8 +11,7 @@ import { MobileSchedulesPage } from './mobile-schedules-page';
 import { MobileTransactionEntryPage } from './mobile-transaction-entry-page';
 import { SettingsPage } from './settings-page';
 
-const NAVBAR_ROWS = 2;
-const NAV_LINKS_HIDDEN_BY_DEFAULT = ['Reports', 'Schedules', 'Settings'];
+const SECONDARY_PAGES = ['Budget', 'Reports', 'Schedules', 'Settings'];
 const ROUTES_BY_PAGE = {
   Budget: '/budget',
   Accounts: '/accounts',
@@ -27,75 +25,11 @@ export class MobileNavigation {
   readonly page: Page;
   readonly heading: Locator;
   readonly navbar: Locator;
-  readonly mainContentSelector: string;
-  readonly navbarSelector: string;
 
   constructor(page: Page) {
     this.page = page;
     this.heading = page.getByRole('heading');
-    this.navbar = page.locator('[data-navbar-state]');
-    this.mainContentSelector = '[role=main]';
-    this.navbarSelector = '[data-navbar-state]';
-  }
-
-  async dragNavbarUp() {
-    const mainContentBoundingBox = await this.page
-      .locator(this.mainContentSelector)
-      .boundingBox();
-
-    if (!mainContentBoundingBox) {
-      throw new Error('Unable to get bounding box of main content.');
-    }
-
-    const navbarBoundingBox = await this.page
-      .locator(this.navbarSelector)
-      .boundingBox();
-
-    if (!navbarBoundingBox) {
-      throw new Error('Unable to get bounding box of navbar.');
-    }
-
-    await this.page.dragAndDrop(this.navbarSelector, this.mainContentSelector, {
-      sourcePosition: { x: 1, y: 0 },
-      targetPosition: {
-        x: 1,
-        y: mainContentBoundingBox.height - navbarBoundingBox.height,
-      },
-    });
-  }
-
-  async dragNavbarDown() {
-    const boundingBox = await this.page
-      .locator(this.navbarSelector)
-      .boundingBox();
-
-    if (!boundingBox) {
-      throw new Error('Unable to get bounding box of navbar.');
-    }
-
-    await this.page.dragAndDrop(this.navbarSelector, this.navbarSelector, {
-      sourcePosition: { x: 1, y: 0 },
-      targetPosition: {
-        x: 1,
-        // Only scroll until bottom of screen i.e. bottom of first navbar row.
-        y: boundingBox.height / NAVBAR_ROWS,
-      },
-    });
-
-    await expect(this.navbar).not.toHaveAttribute('data-navbar-state', 'open');
-  }
-
-  async hasNavbarState(...states: string[]) {
-    if ((await this.navbar.count()) === 0) {
-      // No navbar on page.
-      return false;
-    }
-
-    const dataNavbarState = await this.navbar.getAttribute('data-navbar-state');
-    if (!dataNavbarState) {
-      throw new Error('Navbar does not have data-navbar-state attribute.');
-    }
-    return states.includes(dataNavbarState);
+    this.navbar = page.getByRole('navigation', { name: 'Main navigation' });
   }
 
   async navigateToPage<T extends { waitFor: Locator['waitFor'] }>(
@@ -111,24 +45,24 @@ export class MobileNavigation {
 
     await this.navbar.waitFor();
 
-    const navbarStates = NAV_LINKS_HIDDEN_BY_DEFAULT.includes(pageName)
-      ? ['default', 'hidden']
-      : ['hidden'];
-
-    if (await this.hasNavbarState(...navbarStates)) {
-      await this.dragNavbarUp();
+    if (SECONDARY_PAGES.includes(pageName)) {
+      await this.navbar
+        .getByRole('button', { name: 'More', exact: true })
+        .click();
+      await this.page
+        .getByRole('dialog', { name: 'More', exact: true })
+        .getByRole('button', { name: pageName, exact: true })
+        .click();
+    } else {
+      await this.navbar
+        .getByRole('link', {
+          name: pageName === 'Transaction' ? 'Add transaction' : pageName,
+          exact: true,
+        })
+        .click();
     }
-
-    const link = this.navbar.getByRole('link', { name: pageName });
-    // Click via evaluate: the navbar uses react-spring transforms, so
-    // Playwright's viewport-stability check rejects mid-animation clicks.
-    await link.evaluate(el => (el as HTMLElement).click());
 
     await pageInstance.waitFor();
-
-    if (await this.hasNavbarState('open')) {
-      await this.dragNavbarDown();
-    }
 
     return pageInstance;
   }

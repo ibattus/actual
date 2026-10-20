@@ -43,6 +43,7 @@ export const calculatorAmountNormalStyle = {
 
 export type CalculatorAmountInputProps = {
   value: number;
+  'aria-label'?: string;
   variant?: 'normal' | 'large';
   negate?: boolean;
   style?: CSSProperties;
@@ -220,6 +221,7 @@ export const CalculatorAmountInput = memo(function CalculatorAmountInput({
             : calculatorAmountNormalStyle),
           ...style,
         }}
+        aria-label={props['aria-label']}
         disabled={props.disabled}
         {...{
           ...(focused &&

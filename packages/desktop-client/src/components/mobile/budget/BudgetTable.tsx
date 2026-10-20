@@ -34,7 +34,7 @@ import { envelopeBudget, trackingBudget } from '#spreadsheet/bindings';
 import { ExpenseGroupList } from './ExpenseGroupList';
 import { IncomeGroup } from './IncomeGroup';
 
-export const ROW_HEIGHT = 50;
+export const ROW_HEIGHT = 56;
 
 export const PILL_STYLE: CSSProperties = {
   borderRadius: 16,
@@ -526,7 +526,7 @@ function BudgetTableHeader({
                       />
                     </View>
                   </View>
-                  <View>
+                  <View style={{ width: '100%', minWidth: 0 }}>
                     <PrivacyFilter>
                       <AutoTextSize
                         key={value}
@@ -536,7 +536,8 @@ function BudgetTableHeader({
                         mode="oneline"
                         style={{
                           ...amountStyle,
-                          paddingRight: 4,
+                          paddingRight: 8,
+                          boxSizing: 'border-box',
                         }}
                       >
                         {format(
@@ -594,7 +595,7 @@ function BudgetTableHeader({
                       />
                     </View>
                   </View>
-                  <View>
+                  <View style={{ width: '100%', minWidth: 0 }}>
                     <PrivacyFilter>
                       <AutoTextSize
                         key={value}
@@ -604,7 +605,8 @@ function BudgetTableHeader({
                         mode="oneline"
                         style={{
                           ...amountStyle,
-                          paddingRight: 4,
+                          paddingRight: 8,
+                          boxSizing: 'border-box',
                         }}
                       >
                         {format(value, type)}
@@ -637,7 +639,7 @@ function BudgetTableHeader({
                     style={{ color: theme.formInputText }}
                   />
                 </View>
-                <View>
+                <View style={{ width: '100%', minWidth: 0 }}>
                   <PrivacyFilter>
                     <AutoTextSize
                       key={value}

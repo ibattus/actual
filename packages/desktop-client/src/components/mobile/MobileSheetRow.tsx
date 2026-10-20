@@ -10,21 +10,24 @@ type MobileSheetRowProps = {
   label: ReactNode;
   onPress: () => void;
   isDestructive?: boolean;
+  isPressed?: boolean;
 };
 
 export function MobileSheetRow({
   label,
   onPress,
   isDestructive = false,
+  isPressed,
 }: MobileSheetRowProps) {
   return (
     <Button
       variant="bare"
+      aria-pressed={isPressed}
       onPress={onPress}
       style={{
         ...styles.mediumText,
         width: '100%',
-        minHeight: styles.mobileMinHeight,
+        minHeight: 52,
         justifyContent: 'flex-start',
         padding: `${spacing.sm}px ${spacing.lg}px`,
         borderRadius: 0,

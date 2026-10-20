@@ -25,9 +25,10 @@ export function FieldLabel({ title, flush, style }: FieldLabelProps) {
   return (
     <Text
       style={{
-        marginBottom: 5,
-        marginTop: flush ? 0 : 25,
-        fontSize: 14,
+        marginBottom: 8,
+        marginTop: flush ? 0 : 18,
+        fontSize: 13,
+        fontWeight: 600,
         color: theme.tableRowHeaderText,
         padding: `0 ${styles.mobileEditingPadding}px`,
         userSelect: 'none',
@@ -44,7 +45,8 @@ const valueStyle = {
   borderColor: theme.formInputBorder,
   marginLeft: 8,
   marginRight: 8,
-  height: styles.mobileMinHeight,
+  height: 52,
+  borderRadius: 12,
 };
 
 export const hideNativeDateIconClassName = css({
@@ -78,9 +80,10 @@ const iconFieldWrapperClassName = css({
   ...valueStyle,
   flexDirection: 'row',
   alignItems: 'center',
-  paddingLeft: 8,
-  paddingRight: 8,
-  gap: 8,
+  paddingLeft: 12,
+  paddingRight: 12,
+  gap: 10,
+  '& input::placeholder': { color: theme.pageTextLight, opacity: 1 },
   '&:focus-within': {
     borderColor: theme.formInputBorderSelected,
   },
@@ -261,9 +264,7 @@ export function TapField({
               flex: 1,
               userSelect: 'none',
               textAlign: 'left',
-              color: showPlaceholder
-                ? theme.formInputTextPlaceholder
-                : undefined,
+              color: showPlaceholder ? theme.pageTextLight : undefined,
               ...textStyle,
             }}
           >
@@ -287,10 +288,12 @@ export function ToggleField({
   style,
   className,
   isDisabled = false,
+  'aria-label': ariaLabel,
 }: ToggleFieldProps) {
   return (
     <Toggle
       id={id}
+      aria-label={ariaLabel}
       isOn={isOn}
       isDisabled={isDisabled}
       onToggle={onToggle}

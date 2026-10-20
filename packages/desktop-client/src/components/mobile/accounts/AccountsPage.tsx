@@ -41,7 +41,7 @@ import { useDispatch, useSelector } from '#redux';
 import type { Binding, SheetFields } from '#spreadsheet';
 import * as bindings from '#spreadsheet/bindings';
 
-const ROW_HEIGHT = 60;
+const ROW_HEIGHT = 68;
 
 // Virtual account id for the all-accounts transaction list (/accounts/all)
 export const ALL_ACCOUNTS_ID = 'all';
@@ -229,7 +229,7 @@ function EmptyMessage({ onAddAccount }: { onAddAccount: () => void }) {
   return (
     <View
       style={{
-        minHeight: `calc(100vh - ${MOBILE_NAV_HEIGHT}px - 140px)`,
+        minHeight: `calc(100dvh - ${MOBILE_NAV_HEIGHT} - 140px)`,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 30,
@@ -512,9 +512,9 @@ const AccountList = forwardRef<HTMLDivElement, AccountListProps>(
         style={{
           display: 'flex',
           flexDirection: 'column',
-          margin: '0 8px',
+          margin: '0 12px',
           border: `1px solid ${theme.tableBorder}`,
-          borderRadius: 8,
+          borderRadius: 16,
           overflow: 'hidden',
         }}
       >

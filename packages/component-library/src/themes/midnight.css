@@ -120,9 +120,9 @@
   --color-menuAutoCompleteItemText: var(--color-menuItemText);
   --color-modalBackground: var(--palette-gray700);
   --color-modalBorder: var(--palette-gray200);
-  --color-mobileHeaderBackground: var(--palette-gray900);
-  --color-mobileHeaderText: var(--palette-purple200);
-  --color-mobileHeaderTextSubdued: var(--palette-gray200);
+  --color-mobileHeaderBackground: var(--color-mobilePageBackground);
+  --color-mobileHeaderText: var(--color-pageText);
+  --color-mobileHeaderTextSubdued: var(--color-pageTextSubdued);
   --color-mobileHeaderTextHover: rgba(200, 200, 200, 0.15);
   --color-mobilePageBackground: var(--palette-gray900);
   --color-mobileNavBackground: var(--palette-gray600);

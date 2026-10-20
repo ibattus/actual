@@ -42,6 +42,9 @@ export type ConfirmTransactionEditReason =
 
 export type Modal =
   | {
+      name: 'mobile-navigation';
+    }
+  | {
       name: 'import-transactions';
       options: {
         accountId: string;

@@ -31,6 +31,7 @@ import { AuthSettings } from './AuthSettings';
 import { Backups } from './Backups';
 import { BudgetTypeSettings } from './BudgetTypeSettings';
 import { CurrencySettings } from './Currency';
+import { DefaultTransactionAccount } from './DefaultTransactionAccount';
 import { EncryptionSettings } from './Encryption';
 import { ExperimentalFeatures } from './Experimental';
 import { ExportBudget } from './Export';
@@ -278,6 +279,7 @@ export function GeneralSettings() {
       <ThemeSettings />
       {!isNarrowWidth && <SidebarSettings />}
       <FormatSettings />
+      <DefaultTransactionAccount />
       {isCurrencyExperimentalEnabled && <CurrencySettings />}
       <LanguageSettings />
       <SettingsGroup title={t('Budget')}>

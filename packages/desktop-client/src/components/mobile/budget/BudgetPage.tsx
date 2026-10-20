@@ -54,6 +54,7 @@ import { useLocale } from '#hooks/useLocale';
 import { useLocalPref } from '#hooks/useLocalPref';
 import { useNavigate } from '#hooks/useNavigate';
 import { useOverspentCategories } from '#hooks/useOverspentCategories';
+import { usePrivacyMode } from '#hooks/usePrivacyMode';
 import { SheetNameProvider } from '#hooks/useSheetName';
 import { useSheetValue } from '#hooks/useSheetValue';
 import { useSpreadsheet } from '#hooks/useSpreadsheet';
@@ -797,6 +798,7 @@ function OverbudgetedBanner({ month, onBudgetAction, ...props }) {
 
 function OverspendingBanner({ month, onBudgetAction, budgetType, ...props }) {
   const { t } = useTranslation();
+  const privacyMode = usePrivacyMode();
 
   const {
     data: { list: categories, grouped: categoryGroups } = {
@@ -928,7 +930,11 @@ function OverspendingBanner({ month, onBudgetAction, budgetType, ...props }) {
             <Trans count={numberOfOverspentCategories}>
               You have {{ count: numberOfOverspentCategories }} overspent
               categories (
-              <FinancialText>
+              <FinancialText
+                style={{
+                  fontFamily: privacyMode ? 'Redacted Script' : undefined,
+                }}
+              >
                 {
                   {
                     amount: format(totalOverspending, 'financial'),

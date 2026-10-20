@@ -28,6 +28,7 @@ FROM deps AS builder
 WORKDIR /app
 
 COPY packages/ ./packages/
+COPY .gitignore ./
 
 # Increase memory limit for the build process to 8GB
 ENV NODE_OPTIONS=--max_old_space_size=8192
@@ -38,6 +39,9 @@ ENV NODE_OPTIONS=--max_old_space_size=8192
 RUN git -c init.defaultBranch=master init -q \
     && git -c user.email=build@docker -c user.name=docker-build add -A \
     && git -c user.email=build@docker -c user.name=docker-build commit -qm build
+
+# Yarn disables better-sqlite3's install script; the server needs its native binding.
+RUN npm rebuild better-sqlite3
 
 RUN yarn build:server
 

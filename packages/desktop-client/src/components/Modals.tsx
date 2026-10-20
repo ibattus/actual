@@ -12,6 +12,7 @@ import { closeModal } from '#modals/modalsSlice';
 import { useDispatch } from '#redux';
 
 import { EditSyncAccount } from './banksync/EditSyncAccount';
+import { MobileNavigationMenu } from './mobile/MobileNavigationMenu';
 import { AccountAutocompleteModal } from './modals/AccountAutocompleteModal';
 import { AccountGroupsModal } from './modals/AccountGroupsModal';
 import { AccountMenuModal } from './modals/AccountMenuModal';
@@ -112,6 +113,9 @@ export function Modals() {
       const { name } = modal;
       const key = `${name}-${idx}`;
       switch (name) {
+        case 'mobile-navigation':
+          return <MobileNavigationMenu key={key} />;
+
         case 'goal-templates':
           return budgetId ? <GoalTemplateModal key={key} /> : null;
 

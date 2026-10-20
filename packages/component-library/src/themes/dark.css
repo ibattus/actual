@@ -119,14 +119,14 @@
 
   --color-modalBackground: var(--palette-gray800);
   --color-modalBorder: var(--palette-navy600);
-  --color-mobileHeaderBackground: var(--palette-purple800);
-  --color-mobileHeaderText: var(--palette-navy150);
-  --color-mobileHeaderTextSubdued: var(--palette-gray200);
+  --color-mobileHeaderBackground: var(--color-mobilePageBackground);
+  --color-mobileHeaderText: var(--color-pageText);
+  --color-mobileHeaderTextSubdued: var(--color-pageTextSubdued);
   --color-mobileHeaderTextHover: rgba(200, 200, 200, 0.15);
   --color-mobilePageBackground: var(--palette-navy700);
   --color-mobileNavBackground: var(--palette-navy800);
   --color-mobileNavItem: var(--palette-navy150);
-  --color-mobileNavItemSelected: var(--palette-purple400);
+  --color-mobileNavItemSelected: var(--palette-purple200);
   --color-mobileAccountShadow: var(--color-cardShadow);
   --color-mobileAccountText: var(--palette-blue800);
   --color-mobileTransactionSelected: var(--palette-purple400);

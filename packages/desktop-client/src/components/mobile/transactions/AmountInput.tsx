@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react';
-import type { FocusEvent } from 'react';
+import type { CSSProperties, FocusEvent } from 'react';
 
 import { styles } from '@actual-app/components/styles';
 import * as Platform from '@actual-app/core/shared/platform';
@@ -12,19 +12,25 @@ import { FocusableAmountInput } from './FocusableAmountInput';
 
 export type AmountInputProps = Omit<CalculatorAmountInputProps, 'onFocus'> & {
   disableNativeAutoFocusOnIOS?: boolean;
+  hideSignToggle?: boolean;
+  textStyle?: CSSProperties;
   onFocus?: (event?: FocusEvent<HTMLInputElement>) => void;
+  onAmountPress?: () => void;
 };
 
 export const AmountInput = memo(function AmountInput({
   autoFocus = false,
   disableNativeAutoFocusOnIOS = false,
   disabled,
+  hideSignToggle,
+  textStyle,
   inputRef,
   negate = false,
   onBlur,
   onChange,
   onEnter,
   onFocus,
+  onAmountPress,
   value,
   variant = 'normal',
   ...props
@@ -55,6 +61,7 @@ export const AmountInput = memo(function AmountInput({
         onFocus={onFocus}
         value={value}
         variant={variant}
+        style={{ ...props.style, ...textStyle }}
       />
     );
   }
@@ -62,7 +69,9 @@ export const AmountInput = memo(function AmountInput({
   return (
     <FocusableAmountInput
       {...props}
+      onAmountPress={onAmountPress}
       disabled={disabled}
+      hideSignToggle={hideSignToggle}
       focused={focused}
       inputRef={inputRef}
       onBlur={event => {
@@ -88,11 +97,13 @@ export const AmountInput = memo(function AmountInput({
           : undefined
       }
       style={props.style}
-      textStyle={
-        variant === 'large'
-          ? { ...styles.veryLargeText, textAlign: 'center' }
-          : undefined
-      }
+      textStyle={{
+        ...(variant === 'large' && {
+          ...styles.veryLargeText,
+          textAlign: 'center',
+        }),
+        ...textStyle,
+      }}
       value={value}
       zeroSign={negate ? '-' : '+'}
     />
